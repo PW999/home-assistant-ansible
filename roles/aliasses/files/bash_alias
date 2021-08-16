@@ -1,0 +1,6 @@
+alias ll='ls -alh --color=auto'
+alias please=sudo
+alias gst='git status'
+alias gcmsg='git commit -m'
+alias ga='git add'
+alias gaa='git add *'

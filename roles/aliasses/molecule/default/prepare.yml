@@ -1,0 +1,14 @@
+---
+- hosts: all
+  tasks:
+    - name: Create the molecule group
+      ansible.builtin.group:
+        name: molecule
+        state: present
+
+    - name: Create a test user that is not root
+      ansible.builtin.user:
+        name: molecule
+        comment: This is for testing purposes
+        state: present
+        groups: molecule

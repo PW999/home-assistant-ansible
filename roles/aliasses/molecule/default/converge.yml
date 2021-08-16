@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    aliasses_users:
+      - molecule
+  tasks:
+    - name: "Include aliasses role"
+      include_role:
+        name: "aliasses"

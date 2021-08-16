@@ -1,0 +1,23 @@
+---
+- name: Add aliases file
+  copy:
+    src: bash_alias
+    dest: /home/{{ user }}/.bash_alias
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0700'
+  when: user != 'root'
+  loop: "{{ aliasses_users }}"
+  loop_control:
+    loop_var: user
+
+- name: Add reference to alias file
+  lineinfile:
+    path: /home/{{ user }}/.bashrc
+    line: source $HOME/.bash_alias
+    state: present
+    insertafter: EOF
+  when: user != 'root'
+  loop: "{{ aliasses_users }}"
+  loop_control:
+    loop_var: user
