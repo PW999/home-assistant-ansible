@@ -1,0 +1,7 @@
+.vagrant
+.vscode
+get-docker.sh
+hass-installer.sh
+hass.yaml
+openvpn-install.sh
+roles/Z_*
