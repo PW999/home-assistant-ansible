@@ -5,3 +5,4 @@ hass-installer.sh
 hass.yaml
 openvpn-install.sh
 roles/Z_*
+**/__pycache__
