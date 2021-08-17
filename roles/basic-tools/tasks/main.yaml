@@ -1,0 +1,5 @@
+---
+- name: Install latests utilities    # noqa package-latest
+  apt:
+    name: [vim-tiny, lsof, htop, ca-certificates, wget, curl, jq]
+    state: latest
