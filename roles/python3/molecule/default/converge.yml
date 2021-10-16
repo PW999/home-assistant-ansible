@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+
+  tasks:
+    - name: "Include python3 role"
+      include_role:
+        name: "python3"
