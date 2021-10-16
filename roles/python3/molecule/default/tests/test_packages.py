@@ -8,7 +8,12 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 @pytest.mark.parametrize('package_name', [
   'python3',
-  'python3-pip'
+  'python3-pip',
+  'python3-wheel',
+  'python3-dev',
+  'python3-setuptools',
+  'python3-cryptography',
+  'gcc'
 ])
 def test_package(host, package_name):
     package = host.package(package_name)
