@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include hass-srv-dir role"
+      include_role:
+        name: "hass-srv-dir"

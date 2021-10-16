@@ -1,0 +1,21 @@
+---
+- name: Make install_dir variable a fact
+  set_fact:
+    install_dir: "{{ install_dir }}"
+
+- name: Create the installation directory {{ install_dir }}
+  file:
+    path: "{{ install_dir }}"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory
+
+# The setup folder will be used by this playbook to store some files
+- name: Create the {{ install_dir }}/setup directory
+  file:
+    path: "{{ install_dir }}/setup"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory

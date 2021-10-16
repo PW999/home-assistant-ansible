@@ -1,0 +1,16 @@
+---
+dependencies:
+
+galaxy_info:
+  role_name: hass_srv_dir
+  author: P_W999
+  description: Creates the location where the system will install all services
+  license: "license (MPL-2.0)"
+  min_ansible_version: 2.10
+  platforms:
+    - name: Debian
+      versions:
+        - '10'
+    - name: Raspbian
+      versions:
+        - '10'
