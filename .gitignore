@@ -6,3 +6,4 @@ hass.yaml
 openvpn-install.sh
 roles/Z_*
 **/__pycache__
+*.bak
