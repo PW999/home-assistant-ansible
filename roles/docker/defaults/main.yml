@@ -1,0 +1,6 @@
+---
+# if set to true, then docker will be installed but not started
+# this is the "official" docker-in-docker method which re-uses the
+# host's docker instance. Could be use in some molecule cases (though
+# that would require constant cleanup of the host's docker env)
+docker_in_docker: false

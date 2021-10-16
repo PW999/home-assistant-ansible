@@ -1,0 +1,57 @@
+---
+- name: Download get.docker.com convenience script
+  get_url:
+    url: https://get.docker.com
+    dest: "{{ install_dir }}/setup/get-docker.sh"
+    mode: 0740
+
+- name: Modify script to exit instead of sleep when something fails
+  replace:
+    path: "{{ install_dir }}/setup/get-docker.sh"
+    regexp: 'sleep'
+    replace: 'exit'
+
+- name: Install docker using the convenience script
+  command:
+    cmd: "{{ install_dir }}/setup/get-docker.sh"
+    chdir: /tmp
+    creates: /usr/bin/docker
+
+- name: Create the docker config directory
+  file:
+    path: /etc/docker/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy hass daemon config
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0744'
+  register: daemon_file
+
+- name: Install libffi for docker-compose    # noqa package-latest
+  apt:
+    name: [libffi-dev]
+    state: latest
+
+- name: Install docker-compose   # noqa package-latest
+  pip:
+    name: docker-compose
+    state: latest
+
+- name: Install python3 docker library   # noqa package-latest
+  pip:
+    name: docker
+    state: latest
+
+- name: Make sure docker is enabled and running
+  ansible.builtin.systemd:
+    state: "{% if daemon_file.changed %}restarted{% else %}started{% endif %}"
+    name: docker
+    enabled: true
+  when: not docker_in_docker

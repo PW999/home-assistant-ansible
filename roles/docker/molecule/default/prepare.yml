@@ -1,0 +1,15 @@
+---
+- hosts: all
+  tasks:
+
+    - name: Make sure systemd-networkd is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd
+        enabled: true
+
+    - name: Make sure systemd-networkd-wait-online is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd-wait-online
+        enabled: true

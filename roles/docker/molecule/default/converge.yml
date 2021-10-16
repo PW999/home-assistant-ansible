@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: "Include docker role"
+      include_role:
+        name: "docker"
