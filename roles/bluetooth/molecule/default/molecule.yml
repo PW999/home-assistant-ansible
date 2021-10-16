@@ -1,0 +1,27 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: |
+    set -e
+    yamllint .
+    ansible-lint
+    flake8
+platforms:
+  - name: "${MOLECULE_NAME}"
+    dockerfile: ../../../resources/Dockerfile.j2
+    build_image: true
+    image: "${MOLECULE_DISTRO}:${MOLECULE_DISTRO_VERSION}"
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      TZ: Europe/Brussels
+      APT_PROXY_URL: http://$APT_CACHE_IP:$APT_CACHE_PORT
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ./prepare.yml
+    converge: ./converge.yml
+verifier:
+  name: testinfra
+  directory: ./tests/

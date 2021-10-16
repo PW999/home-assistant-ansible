@@ -1,0 +1,14 @@
+---
+- name: Install latest bluetooth dependencies  # noqa package-latest
+  package:
+    name:
+      - bluez
+    state: latest
+
+- name: Enable bluetooth service
+  ansible.builtin.systemd:
+    state: started
+    name: bluetooth
+    enabled: true
+  # without a BT adapter this service won't start
+  when: ansible_connection != "community.docker.docker" and ansible_connection != "docker"

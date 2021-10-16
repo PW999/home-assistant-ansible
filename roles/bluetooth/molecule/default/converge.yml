@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: "Include bluetooth role"
+      include_role:
+        name: "bluetooth"
