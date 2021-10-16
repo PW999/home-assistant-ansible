@@ -11,6 +11,11 @@
     regexp: 'sleep'
     replace: 'exit'
 
+- name: Install dependencies for convenience script    # noqa package-latest
+  apt:
+    name: [apt-transport-https, ca-certificates, curl]
+    state: latest
+
 - name: Install docker using the convenience script
   command:
     cmd: "{{ install_dir }}/setup/get-docker.sh"
