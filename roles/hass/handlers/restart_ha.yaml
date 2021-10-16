@@ -1,0 +1,23 @@
+---
+# https://medium.com/opsops/using-block-for-handlers-in-ansible-a55f45b62a96
+# Workaround for block works, but rescue doesn't work in handlers
+- block:
+    - name: Restart command
+      command:
+        cmd: docker exec hassio_cli ha core restart
+      ignore_errors: true
+      register: ha_restart_cmd
+    - name: Print error
+      debug:
+        msg: "The stdout was: {{ ha_restart_cmd.stdout }}"
+      when: ha_restart_cmd.failed
+    - name: Check that the failure is due to HA not being setup yet
+      assert:
+        success_msg: "Could not restart Home Assistant because it's still being setup, please restart HA later"
+        fail_msg: "An unknown error occured while trying to restart HA"
+        that:
+          - >
+            'System is not ready with state: setup' in ha_restart_cmd.stdout
+            or
+            'Error: Unknown error, see supervisor' in ha_restart_cmd.stdout
+      when: ha_restart_cmd.failed

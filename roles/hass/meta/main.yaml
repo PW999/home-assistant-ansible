@@ -1,0 +1,18 @@
+---
+dependencies:
+  - robertdebock.update_package_cache
+  - hass-srv-dir
+  - docker
+
+galaxy_info:
+  author: P_W999
+  description: Installs a supervised Home Assistant using the convenience script
+  license: "license (MPL-2.0)"
+  min_ansible_version: 2.10
+  platforms:
+    - name: Debian
+      versions:
+        - '10'
+    - name: Raspbian
+      versions:
+        - '10'

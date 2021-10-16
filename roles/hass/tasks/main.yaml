@@ -1,0 +1,61 @@
+---
+# Docker will be installed using it's own role
+- name: Install latest hass requirements   # noqa package-latest
+  apt:
+    name: [network-manager, apparmor, apparmor-utils, jq, curl, dbus]
+    install_recommends: false
+    state: latest
+
+- name: Make sure NetworkManager is running and enabled
+  service:
+    name: NetworkManager
+    state: started
+    enabled: true
+
+- name: Disable modem manager in preference of serial devices
+  ansible.builtin.systemd:
+    state: stopped
+    name: ModemManager
+    enabled: false
+  tags: notest
+
+# For idempotency checks of molecule
+- name: Check if script was already downloaded
+  stat:
+    path: "{{ install_dir }}/setup/hass-installer.sh"
+  register: hass_installer
+
+- name: Download Home Assistant supervised install script
+  get_url:
+    url: https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh
+    dest: "{{ install_dir }}/setup/hass-installer.sh"
+    mode: 0740
+    force: false
+  when: not hass_installer.stat.exists
+
+# Otherwise the script keeps waiting
+- name: Modify script to not read from /dev/tty  # noqa no-handler
+  replace:
+    path: "{{ install_dir }}/setup/hass-installer.sh"
+    regexp: 'read answer < /dev/tty'
+    replace: 'answer=y'
+
+- name: Print machine type
+  debug:
+    var: machine_type
+
+- name: Create the hass data directory
+  file:
+    path: "{{ install_dir }}/homeassistant"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory
+
+- name: Supervised installer  # noqa no-handler
+  command:
+    cmd: |
+      {{ install_dir }}/setup/hass-installer.sh
+      --machine {{ machine_type }}
+      --data-share {{ install_dir }}/homeassistant
+    creates: "{{ install_dir }}/homeassistant/updater.json"
