@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    docker_in_docker: false
+
+    hass_backup_ssh_key: files/molecule
+    hass_backup_hour: 6
+    hass_backup_rsync_destination: homeassistant@10.0.0.100::NetBackup/hass-backup/
+  tasks:
+    - name: "Include hass-rsync-backup role"
+      include_role:
+        name: "hass-rsync-backup"

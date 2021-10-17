@@ -1,0 +1,64 @@
+---
+
+- name: Install latest cron and rysnc    # noqa package-latest
+  apt:
+    name: [cron, rsync]
+    state: latest
+
+- name: Create backup log directory
+  file:
+    path: "{{ hass_backup_log_dir }}"
+    owner: root
+    group: root
+    mode: '0740'
+    state: directory
+
+- name: Create root .ssh directory
+  file:
+    path: /root/.ssh
+    owner: root
+    group: root
+    mode: '0700'
+    state: directory
+
+- name: Copy the private key to the root user
+  copy:
+    src: "{{ hass_backup_ssh_key }}"
+    dest: /root/.ssh/homeassistant-rsync
+    owner: root
+    mode: 0400
+
+- name: Create the backup job for the install directory
+  cron:
+    name: Backup {{ install_dir }} folder to remote location
+    minute: '0'
+    hour: "{{ hass_backup_hour }}"
+    job: >
+      echo rsync -av --delete
+      -e "ssh -i /root/.ssh/homeassistant-rsync -p 22"
+      {{ install_dir }} {{ hass_backup_rsync_destination }} 2>&1 >> /var/log/backup/rsync.log
+
+- name: Create the backup job for /etc directory
+  cron:
+    name: Backup /etc folder to remote location
+    minute: '30'
+    hour: "{{ hass_backup_hour }}"
+    job: >
+      echo rsync -av --delete
+      -e "ssh -i /root/.ssh/homeassistant-rsync -p 22"
+      /etc {{ hass_backup_rsync_destination }} 2>&1 >> /var/log/backup/rsync.log
+
+- name: Configure logrotate
+  include_role:
+    name: nickhammond.logrotate
+  vars:
+    logrotate_scripts:
+      - name: rsync-backup
+        path: "{{ hass_backup_log_dir }}/rsync.log"
+        options:
+          - weekly
+          - rotate 8
+          - missingok
+          - compress
+          - delaycompress
+          - copytruncate
