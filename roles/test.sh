@@ -14,13 +14,11 @@ for role in $(ls);
 do
 	if [ -f $role ];
 	then
-		echo "Ignore file $role"
 		continue
 	fi
 
 	if [ $role == 'resources' ];
 	then
-		echo "Ignore resources folder"
 		continue
 	fi
 	
