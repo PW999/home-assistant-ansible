@@ -1,0 +1,11 @@
+#! /bin/sh
+#
+# entrypoint.sh
+
+set -e
+PASSWORD={{samba_password}}
+[[ "$DEBUG" == "true" ]] && set -x
+
+echo -e "{{samba_password}}\n{{samba_password}}" | smbpasswd -a -s -c /etc/samba/smb.conf root
+
+exec "$@"

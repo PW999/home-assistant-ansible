@@ -1,0 +1,42 @@
+---
+- name: Create samba folder
+  file:
+    path: "{{ install_dir }}/samba"
+    owner: root
+    group: root
+    mode: '0711'
+    state: directory
+
+- name: Compile entrypoint
+  ansible.builtin.template:
+    src: templates/entrypoint.sh.j2
+    dest: "{{ install_dir }}/samba/entrypoint.sh"
+    owner: root
+    group: root
+    mode: '0700'
+  register: entrypoint
+
+- name: Compile config
+  ansible.builtin.template:
+    src: templates/smb.conf.j2
+    dest: "{{ install_dir }}/samba/smb.conf"
+    owner: root
+    group: root
+    mode: '0700'
+  register: config
+
+- name: Compile docker-compose template
+  ansible.builtin.template:
+    src: templates/docker-compose.yaml.j2
+    dest: "{{ install_dir }}/samba/docker-compose.yaml"
+    owner: root
+    group: root
+    mode: '0600'
+  register: template
+
+- name: Create samba container
+  community.docker.docker_compose:
+    project_name: samba
+    state: present
+    project_src: "{{ install_dir }}/samba/"
+    restarted: "{{ entrypoint.changed or config.changed or template.changed }}"

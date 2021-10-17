@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    docker_in_docker: false
+
+    samba_password: hunter123
+    samba_workgroup: MICASA
+    samba_version: 4.12.9
+
+  tasks:
+    - name: "Include hass-samba role"
+      include_role:
+        name: "hass-samba"

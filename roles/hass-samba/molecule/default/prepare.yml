@@ -1,0 +1,51 @@
+---
+- hosts: all
+  tasks:
+
+    - name: Make sure systemd-networkd is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd
+        enabled: true
+
+    - name: Make sure systemd-networkd-wait-online is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd-wait-online
+        enabled: true
+
+    - name: Install cifs utils to test mounting the share   # noqa package-latest
+      apt:
+        name: cifs-utils
+        update_cache: true
+        state: latest
+
+    - name: Add user to samba credentials file
+      lineinfile:
+        path: /root/.smbcredentials
+        create: true
+        line: username=root
+        insertbefore: BOF
+        mode: '0700'
+        owner: root
+        group: root
+        state: present
+
+    - name: Add password to samba credentials file
+      lineinfile:
+        path: /root/.smbcredentials
+        create: true
+        line: password=hunter123
+        insertafter: EOF
+        mode: '0400'
+        owner: root
+        group: root
+        state: present
+
+    - name: Create mount point
+      file:
+        path: /mnt/data
+        owner: root
+        group: root
+        mode: '0777'
+        state: directory
