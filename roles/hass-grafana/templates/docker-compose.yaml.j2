@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana:{{ grafana_version }}
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    stop_grace_period: 30s
+    volumes:
+      - {{ install_dir }}/grafana/lib:/var/lib/grafana
+      - {{ install_dir }}/grafana/log:/var/log/grafana
+      - {{ install_dir }}/grafana/etc:/etc/grafana:ro
+    networks:
+      - influx
+    ports:
+      - "3000:3000"
+
+networks:
+  influx:
+    external: true
+    name: influx

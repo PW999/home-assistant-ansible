@@ -1,0 +1,19 @@
+---
+dependencies:
+  - hass-srv-dir
+  - hass
+  - hass-influx
+
+galaxy_info:
+  role_name: hass_grafana
+  author: P_W999
+  description: Creation of a grafana docker container for use in Home Assistant
+  license: "license (MPL-2.0)"
+  min_ansible_version: 2.10
+  platforms:
+    - name: Debian
+      versions:
+        - '10'
+    - name: Raspbian
+      versions:
+        - '10'

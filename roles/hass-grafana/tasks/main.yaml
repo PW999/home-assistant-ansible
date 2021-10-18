@@ -1,0 +1,45 @@
+---
+- name: Create grafana directory
+  file:
+    path: "{{ item }}"
+    owner: '472'
+    group: root
+    mode: '0750'
+    state: directory
+  loop:
+    - "{{ install_dir }}/grafana"
+    - "{{ install_dir }}/grafana/etc"
+    - "{{ install_dir }}/grafana/log"
+    - "{{ install_dir }}/grafana/lib"
+
+- name: Copy default config
+  copy:
+    src: files/
+    dest: "{{ install_dir }}/grafana/etc/"
+    owner: '472'
+    group: root
+    mode: '0750'
+
+- name: Compile datasource template
+  ansible.builtin.template:
+    src: templates/grafana-datasource.yaml.j2
+    dest: "{{ install_dir }}/grafana/etc/provisioning/datasources/influx.yaml"
+    owner: '472'
+    group: root
+    mode: '0750'
+  register: grafana_datasource
+
+- name: Compile docker-compose template
+  ansible.builtin.template:
+    src: templates/docker-compose.yaml.j2
+    dest: "{{ install_dir }}/grafana/docker-compose.yaml"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Create grafana container
+  community.docker.docker_compose:
+    project_name: grafana
+    state: present
+    project_src: "{{ install_dir }}/grafana/"
+    restarted: "{{ grafana_datasource.changed }}"

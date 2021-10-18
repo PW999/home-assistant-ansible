@@ -1,0 +1,19 @@
+---
+- hosts: all
+  tasks:
+
+    - name: Make sure systemd-networkd is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd
+        enabled: true
+
+    - name: Make sure systemd-networkd-wait-online is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd-wait-online
+        enabled: true
+
+    - name: Clean up docker directory   # noqa deprecated-command-syntax no-changed-when
+      command:
+        cmd: rm -rf /var/lib/docker/overlay2/*

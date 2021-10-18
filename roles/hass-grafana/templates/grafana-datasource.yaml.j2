@@ -1,0 +1,10 @@
+
+datasources:
+  - name: Home Assistant
+    url: http://influx:8086 # Connect through influx network
+    type: influxdb
+    access: proxy
+    user: {{ influxdb_read_user }}
+    database: {{ influxdb_db }}
+    password: {{ influxdb_read_user_password }}
+    editable: false
