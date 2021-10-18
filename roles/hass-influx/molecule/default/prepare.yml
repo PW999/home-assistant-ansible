@@ -1,0 +1,35 @@
+---
+- hosts: all
+  tasks:
+
+    - name: Make sure systemd-networkd is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd
+        enabled: true
+
+    - name: Make sure systemd-networkd-wait-online is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-networkd-wait-online
+        enabled: true
+
+    - name: Create the hass directory
+      file:
+        path: /srv/homeassistant/homeassistant/
+        state: directory
+        recurse: true
+        owner: root
+        group: root
+        mode: 0775
+
+    - name: Create the hass files
+      file:
+        path: "{{ item }}"
+        state: touch
+        owner: root
+        group: root
+        mode: 0775
+      loop:
+        - /srv/homeassistant/homeassistant/secrets.yaml
+        - /srv/homeassistant/homeassistant/configuration.yaml

@@ -1,0 +1,69 @@
+---
+- name: Create influx directory
+  file:
+    path: "{{ install_dir }}/influx"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory
+
+- name: Create influx data directory
+  file:
+    path: "{{ install_dir }}/influx/data"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory
+
+- name: Compile docker-compose template
+  ansible.builtin.template:
+    src: templates/docker-compose.yaml.j2
+    dest: "{{ install_dir }}/influx/docker-compose.yaml"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Create influxDB container
+  community.docker.docker_compose:
+    project_name: influx
+    state: present
+    project_src: "{{ install_dir }}/influx/"
+
+
+- name: Wait for Home Assistant to initialize
+  wait_for:
+    path: "{{ install_dir }}/homeassistant/homeassistant/secrets.yaml"
+    sleep: 10
+    timeout: 600
+    msg: >
+      After 10 minutes, Home Assistant did not create it's secrets.yaml file.
+      Please check if the HASS container is running and if there are any errors in the logs.
+
+- name: Add influx secrets to Home Assistant
+  blockinfile:
+    path: "{{ install_dir }}/homeassistant/homeassistant/secrets.yaml"
+    state: present
+    marker_begin: "# BEGIN_ANSIBLE_INFLUX"
+    marker_end: "# END_ANSIBLE_INFLUX"
+    block: |
+      influx_user: {{ influxdb_user }}
+      influx_pass: {{ influxdb_user_password }}
+  notify: Restart homeassistant
+
+- name: Add influx integration to Home Assistant
+  blockinfile:
+    path: "{{ install_dir }}/homeassistant/homeassistant/configuration.yaml"
+    state: present
+    marker_begin: "# BEGIN_ANSIBLE_INFLUX"
+    marker_end: "# END_ANSIBLE_INFLUX"
+    block: |
+      influxdb:
+        host: localhost
+        port: 8086
+        database: homeassistant
+        username: !secret influx_user
+        password: !secret influx_pass
+        ssl: false
+        verify_ssl: false
+        max_retries: 5
+  notify: Restart homeassistant

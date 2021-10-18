@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  influx:
+    image: influxdb:{{ influxdb_version }}
+    container_name: influx
+    hostname: influx
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+        INFLUXDB_USER: {{ influxdb_user }}
+        INFLUXDB_USER_PASSWORD: {{ influxdb_user_password }}
+        INFLUXDB_READ_USER: {{ influxdb_read_user }}
+        INFLUXDB_READ_USER_PASSWORD: {{ influxdb_read_user_password }}
+        INFLUXDB_DB: {{ influxdb_db }}
+        INFLUXDB_HTTP_AUTH_ENABLED: '{{ influxdb_http_auth_enabled }}'
+        INFLUXDB_ADMIN_USER: {{ influxdb_admin_user }}
+        INFLUXDB_ADMIN_PASSWORD: {{ influxdb_admin_password }}
+    volumes:
+    #  - {{ install_dir }}/influx/influxdb.conf:/etc/influxdb/influxdb.conf
+      - {{ install_dir }}/influx/data:/var/lib/influxdb
+    networks:
+      - influx
+    ports:
+      - "8086:8086"
+
+networks:
+  influx:
+    name: influx

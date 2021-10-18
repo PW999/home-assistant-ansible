@@ -1,0 +1,7 @@
+---
+influxdb_version: 1.8.5
+influxdb_user: hass_rw
+influxdb_read_user: hass_ro
+influxdb_db: homeassistant
+influxdb_http_auth_enabled: true
+influxdb_admin_user: admin

@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    docker_in_docker: false
+    machine_type: generic-x86-64
+
+    influxdb_version: 1.8.4
+    influxdb_user: molecule_user
+    influxdb_user_password: molecule_pass
+    influxdb_read_user: molecule_ro_user
+    influxdb_read_user_password: molecule_ro_pass
+    influxdb_db: molecule_db
+    influxdb_http_auth_enabled: true
+    influxdb_admin_user: admin
+    influxdb_admin_password: admin_pwd
+  tasks:
+    - name: "Include hass-influx role"
+      include_role:
+        name: "hass-influx"
