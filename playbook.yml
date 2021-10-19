@@ -1,0 +1,99 @@
+- name: Setups of home assistant
+  hosts: all
+  connection: local
+  become: yes
+  gather_facts: yes
+  roles:
+    - role: hass-srv-dir
+      tags: [ core ]
+
+    - role: robertdebock.diskspace
+      vars:
+        diskspace_mounts:
+          - name: /
+            gigabytes_available: 6  # Start with enough free space on the root FS
+          - name: /var
+            gigabytes_available: 6  # Check if var has enough space for docker containers
+          - name: /var/lib
+            gigabytes_available: 6  # Make sure there's enough free space for docker containers
+          - name: "{{ install_dir }}"
+            gigabytes_available: 6  # Make sure there's enough free space for the user data
+      tags: [ core ]
+      
+    - role: python3
+      tags: [ core ]
+
+    - role: gantsign.keyboard
+      when: keyboard_layout is defined and keyboard_model is defined
+      tags: [ core ]
+
+    - role: robertdebock.hostname
+      when: hostname is defined
+      tags: [ core ]
+
+    - role: robertdebock.common
+      when: hostname is defined or common_nameservers is defined
+      tags: [ core ]
+
+    - role: robertdebock.sysctl
+      when: swap_files is defined
+      tags: [ core ]
+
+    - role: robertdebock.swap
+      when: swap_files is defined
+      tags: [ core ]
+
+    - role: robertdebock.git
+      when: git_username is defined and git_user_email is defined and git_user_name is defined
+      tags: [ core, extra ]
+      
+    - role: robertdebock.tune2fs
+      when: tune2fs_settings is defined
+      tags: [ maintenance ]
+
+    - role: jnv.unattended-upgrades
+      when: ansible_facts['os_family'] == 'Debian' and unattended_package_blacklist is defined
+      tags: [ maintenance, extra ]
+
+    - role: robertdebock.openssh
+      when: openssh_permit_root_login is defined 
+      tags: [ core, extra ]
+
+    - role: basic-tools
+      tags: [ core ]
+
+    - role: bluetooth
+      tags: [ bluetooth ]
+
+    - role: hass
+      tags: [ ha ]
+
+    - role: robertdebock.users  # do it here in so we can add docker to the user's group
+      when: users_user_list is defined
+      tags: [ core ]
+
+    - role: aliasses
+      when: aliasses_users is defined
+      tags: [ core ]
+
+    - role: hass-rsync-backup
+      when: hass_backup_rsync_destination is defined and hass_backup_ssh_key is defined
+      tags: [ backup, extra ]
+
+    - role: hass-influx
+      when: influxdb_admin_password is defined and influxdb_read_user_password is defined and influxdb_user_password is defined
+      tags: [ history, extra ]
+
+    - role: hass-grafana
+      when: influxdb_admin_password is defined and influxdb_read_user_password is defined and influxdb_user_password is defined
+      tags: [ history, extra ]
+
+    - role: hass-samba
+      when: samba_password is defined
+      tags: [ samba, extra ]
+
+    - role: robertdebock.maintenance
+      when: maintenance_journalctl_vacuum is defined
+      tags: [ maintenance ]
+
+
