@@ -17,6 +17,7 @@
     state: stopped
     name: ModemManager
     enabled: false
+  ignore_errors: true # in case modem manager does not exist
   tags: notest
 
 # For idempotency checks of molecule

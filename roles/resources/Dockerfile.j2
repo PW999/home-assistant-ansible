@@ -1,0 +1,130 @@
+# https://github.com/ckaserer/ansible-role-example/blob/master/molecule/default/Dockerfile.j2
+# Molecule managed
+
+{% if item.registry is defined %}
+FROM {{ item.registry.url }}/{{ item.image }}
+{% else %}
+FROM {{ item.image }}
+{% endif %}
+
+{% if item.env is defined %}
+{% for var, value in item.env.items() %}
+{% if value %}
+ENV {{ var }} {{ value }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+# ENABLE APT CACHE #
+RUN echo "Acquire::http::Proxy \"$APT_PROXY_URL\";" > /etc/apt/apt.conf.d/00aptproxy
+
+RUN if [ $(command -v apt-get) ]; then                                                        apt-get update && apt-get install -y python sudo bash ca-certificates iproute2 init && apt-get clean; \
+    elif [ $(command -v zypper) ]; then                                                       zypper refresh && zypper install -y python sudo bash python-xml iproute2 systemd-sysvinit && zypper clean -a; \
+    elif [ $(command -v apk) ]; then                                                          apk update && apk add --no-cache python sudo bash ca-certificates; \
+    elif [ $(command -v xbps-install) ]; then                                                 xbps-install -Syu && xbps-install -y python sudo bash ca-certificates iproute2 && xbps-remove -O; \
+    elif [ $(command -v swupd) ]; then                                                        swupd bundle-add python3-basic sudo iproute2; \
+    elif [ $(command -v dnf) ] && cat /etc/os-release | grep -q '^NAME=Fedora' && \
+           cat /etc/os-release | grep -q '^VERSION_ID=30'; then                               dnf makecache && dnf --assumeyes install python sudo python-devel python3-dnf bash iproute && dnf clean all; \
+    elif [ $(command -v dnf) ] && cat /etc/os-release | grep -q '^NAME=Fedora'; then          dnf makecache && dnf --assumeyes install python sudo python-devel python*-dnf bash iproute && dnf clean all; \
+    elif [ $(command -v dnf) ] && cat /etc/os-release | grep -q '^NAME="CentOS Linux"' ; then dnf makecache && dnf --assumeyes install python36 sudo platform-python-devel python*-dnf bash iproute && dnf clean all && ln -s /usr/bin/python3 /usr/bin/python; \
+    elif [ $(command -v yum) ]; then                                                          yum makecache fast && yum install -y python sudo yum-plugin-ovl bash iproute && sed -i 's/plugins=0/plugins=1/g' /etc/yum.conf && yum clean all; \
+    fi
+
+
+# https://github.com/alehaa/docker-debian-systemd/blob/master/Dockerfile
+# Configure the debconf frontend.
+#
+# This image doesn't include whiptail, dialog, nor the readline perl module.
+# Therefore, the debconf frontend will be set to 'teletype' to avoid error
+# messages about no dialog frontend could be found.
+RUN echo 'debconf debconf/frontend select teletype' | debconf-set-selections
+
+
+# Install the necessary packages.
+#
+# In addition to the regular Debian base image, a BASIC set of packages from the
+# Debian minimal configuration will be installed. After all packages have been
+# installed, the apt caches and some log files will be removed to minimize the
+# image.
+#
+# NOTE: An upgrade will be performed to include updates and security fixes of
+#       installed packages that received updates in the Debian repository after
+#       the upstream image has been created.
+#
+# NOTE: No syslog daemon will be installed, as systemd's journald should fit
+#       most needs. Please file an issue if you think this should be changed.
+
+# Don't let tz-data interrupt us
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update
+# RUN apt-get dist-upgrade -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && apt-get install -y --no-install-recommends \
+        systemd      \
+        systemd-sysv \
+        cron         \
+        anacron      \
+        python3       \
+        python3-apt  \
+        sudo         \
+        kmod         \
+        iputils-ping \
+        && apt-get clean    \
+        && rm -rf                        \
+        /var/lib/apt/lists/*          \
+        /var/log/alternatives.log     \
+        /var/log/apt/history.log      \
+        /var/log/apt/term.log         \
+        /var/log/dpkg.log
+
+# Configure systemd.
+#
+# For running systemd inside a Docker container, some additional tweaks are
+# required. For a detailed list see:
+#
+# https://developers.redhat.com/blog/2016/09/13/ \
+#   running-systemd-in-a-non-privileged-container/
+#
+# Additional tweaks will be applied in the final image below.
+
+# To avoid ugly warnings when running this image on a host running systemd, the
+# following units will be masked.
+#
+# NOTE: This will not remove ALL warnings in all Debian releases, but seems to
+#       work for stretch.
+RUN systemctl mask --   \
+    dev-hugepages.mount \
+    sys-fs-fuse-connections.mount
+
+# The machine-id should be generated when creating the container. This will be
+# done automatically if the file is not present, so let's delete it.
+RUN rm -f           \
+    /etc/machine-id \
+    /var/lib/dbus/machine-id
+
+# Configure systemd.
+#
+# For running systemd inside a Docker container, some additional tweaks are
+# required. Some of them have already been applied above.
+#
+# The 'container' environment variable tells systemd that it's running inside a
+# Docker container environment.
+ENV container docker
+
+# A different stop signal is required, so systemd will initiate a shutdown when
+# running 'docker stop <container>'.
+STOPSIGNAL SIGRTMIN+3
+
+# The host's cgroup filesystem need's to be mounted (read-only) in the
+# container. '/run', '/run/lock' and '/tmp' need to be tmpfs filesystems when
+# running the container without 'CAP_SYS_ADMIN'.
+#
+# NOTE: For running Debian stretch, 'CAP_SYS_ADMIN' still needs to be added, as
+#       stretch's version of systemd is not recent enough. Buster will run just
+#       fine without 'CAP_SYS_ADMIN'.
+VOLUME [ "/sys/fs/cgroup", "/run", "/run/lock", "/tmp" ]
+
+# As this image should run systemd, the default command will be changed to start
+# the init system. CMD will be preferred in favor of ENTRYPOINT, so one may
+# override it when creating the container to e.g. to run a bash console instead.
+CMD [ "/sbin/init" ]
