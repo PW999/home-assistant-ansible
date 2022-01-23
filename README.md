@@ -125,7 +125,7 @@ Below is a list of the variables and what they trigger:
 * `maintenance_journalctl_vacuum`: cleans the journalctl logs which are older this the set value
 
 # Available variables
-There are a *ton* of variables to configure, please have a look at group_vars/all for an example.
+There are a *ton* of variables to configure, please have a look at [group_vars/all](./group_vars/all) for an example.
 
 Check the README's of the different roles in this repository to get a detailled overview of the hass's role's variables.
 

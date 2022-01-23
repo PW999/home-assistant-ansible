@@ -1,0 +1,109 @@
+# Configure the Home Assistant type
+machine_type: generic-x86-64
+
+# Run everything with Python3
+ansible_python_interpreter: /usr/bin/python3
+
+# Configure the hostname
+hostname: hassansible
+hostname_reboot: true
+
+# Configure the hostname, DNS servers and add the new hostname to /etc/hosts
+common_hostname: "{{ hostname }}"
+common_nameservers:
+  - 176.9.93.198
+  - 176.9.1.117
+common_hosts: "{{ groups.all }}"
+common_reboot: true
+
+# Configure the keyboard layout
+keyboard_model: pc105
+keyboard_layout: be
+keyboard_variant: nodeadkeys
+
+# Configure a swapfile
+swap_files:
+  - path: /swapfile
+    size: 1024
+
+# Create these unix groups
+users_group_list:
+  - name: demo
+    gid: 1024
+
+# Create and or configure these unix users
+users_user_list:
+  - name: root
+    cron_allow: true
+
+  - name: demo
+    comment: Home Assistant Demo
+    uid: 1024
+    group: demo
+    groups: users
+    cron_allow: false
+    # openssl passwd -6 -salt a2ed3ed <= change salt to something random, the password is 'insecure'
+    password: $6$a2ed3ed$nv0P3S6MiRTQjkbOuIuYYL85h6PM5pMBfyU/HnAbZ/kIUF635mXhCzj9diTUojt29zwKYMcjSwsYTpHG59i4r.
+    sudo_options:
+      - "{{ hostname }}=(ALL) ALL"
+      - "{{ hostname }}=(ALL) NOPASSWD: /usr/bin/docker ps -a,/usr/bin/docker ps"
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDIdC8h2LYdi1KtD7WCqOeDCW0xEUZJNL0it6bVlJdMxL0r9nLkkCnzXm/vWV6OzDt3JbT8bjYEl3aTmSeQZG7Vu4N2l1ufhfw+XHvUAJsD3XgAJPDgzZ8lhJQ8YdhbuAZORpALz1M2KoNjoOx4PPub4u361+Bbj9ywYoZmXRikaMF1TJi4LjGlgtQjRx8jGVdvRovGVFg4mxF58STbQOFrIAwttYNFkU0GuODh547VbgvxomRK17oRHXmql2++8+IcPzDXzHTbFRTMp/MWtIF8jF2t1WLQdLFafk3WsCq/cDY+AFv+PcPAOK2rAe1fgMFZhRZOlSNnYG+6qG8TT9q/FCcUUjnYvH+97OhSqVfyoZtGUGdfLD4cIQihoaLVyy9y8SYYoOMSluuzu2zJlhz61LqU2w1AVit95LbL3kO5uHS/L98smuMH/tQ12w9BzFpJm3UeYFCQGMMPutwtHQo7ORYxXkgbd3RFalqo0f7MuM/44RakgtObRATVXPtnfVE= phillip@phillip"
+    expires: -1
+
+# Add some handy aliasses like 'll' to these users
+aliasses_users:
+  - demo
+
+# Enable the below for Raspbian
+# unattended_origins_patterns: 'origin=Raspbian,codename=${distro_codename},label=Raspbian'
+# Blacklist docker from unattended upgrades to prevent unwanted restarts of the docker service
+unattended_package_blacklist:
+- docker
+- container.d
+unattended_automatic_reboot: false
+unattended_update_days:
+- "Tue"
+
+# Configure openssh
+openssh_permit_root_login: "no"
+openssh_max_auth_tries: 3
+openssh_password_authentication: "no"
+openssh_pub_key_authentication: "yes"
+openssh_x11_forwarding: "no"
+
+# Configure git for the root user (in case you need to use sudo for git commands
+git_username: root
+git_user_email: demo@localhost
+git_user_name: demo
+
+# Give a lot of care to the filesystem, check every 2 reboots
+tune2fs_settings:
+- device: /dev/sda3
+  maximum_count_mount: 2
+
+# Cleanup the logs every 14d (only if you run the playbook every 14d)
+maintenance_journalctl_vacuum: 14d
+
+# Configure the influx container
+influxdb_version: 1.8.5
+influxdb_user: hass_rw
+influxdb_user_password: hass_rw_pwd
+influxdb_read_user: hass_ro
+influxdb_read_user_password: hass_ro_pwd
+influxdb_db: homeassistant
+influxdb_http_auth_enabled: true
+influxdb_admin_user: admin
+influxdb_admin_password: admin_pwd
+
+# Configure the grafana container (it'll use the credentials from influx_db_ro*)
+grafana_version: 7.5.6
+
+# Setup Samba
+samba_workgroup: MYCASA
+samba_version: 4.12.9
+samba_password: YOUR_PASSWORD
+
+# Setup an rsync to a remote server (e.g. a Synology to which you added your pub-key)
+hass_backup_rsync_destination: 'homeassistant@YOUR_IP::NetBackup/home-assistant/'
+hass_backup_ssh_key: files/key.priv
