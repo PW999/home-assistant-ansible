@@ -1,4 +1,18 @@
 # Home Assistant Supervised Playbook
+![GitHub](https://img.shields.io/github/license/PW999/home-assistant-ansible)
+![BETA](https://img.shields.io/badge/status-beta-yellowgreen)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/pw999/home-assistant-ansible)
+![Maintenance](https://img.shields.io/maintenance/yes/2022)
+
+
+![Tested](https://img.shields.io/badge/Debian-10-green)
+![Tested](https://img.shields.io/badge/Ubuntu-20-green)
+![Not tested, should work](https://img.shields.io/badge/Raspbian-10-yellow)
+![Will not work](https://img.shields.io/badge/Arch%20Linux-not%20supported-red)
+![Will not work](https://img.shields.io/badge/CentOS-not%20supported-red)
+![Will not work](https://img.shields.io/badge/Fedora-not%20supported-red)
+![Will not work](https://img.shields.io/badge/Red%20Hat-not%20supported-red)
+
 
 This playbook installs the latest Home Assistant Supervised on Debian/Raspbian/Ubuntu.
 
@@ -7,7 +21,7 @@ More information about the Home Assistant supervised installer can be found in [
 ## Project Description
 
 This ansible playbook creates a complete Home Assistant environment from scratch. I originally started working on this playbook because I wanted to have a fast way of restoring and re-installing Home Assistant in case something would happen to my current installation (because no Home Assistant means no lights).
-The playbook can also install extra services like Influx and Grafana without relying on the Home Assistant Supervisor, this is mainly because I prefer to have an easy way to migrate such services to another instance. 
+The playbook can also install extra services like Influx and Grafana without relying on the Home Assistant Supervisor, this is mainly because I prefer to have an easy way to migrate such services to another instance.
 The playbook as it comes will reflect my personal setup, but I'll try to make it as configurable as possible for easy re-use.
 
 Once installed you can update Home Assistant through it's supervisor, this playbook won't re-install Docker or Home Assistant once it's installed. Updating the OS and it's dependencies can be done using the playbook.
@@ -129,22 +143,22 @@ For the other roles, please have a look at these repo's README's
 * [unattended-upgrades](https://github.com/jnv/ansible-role-unattended-upgrades)
 
 # Testing
-All the included roles in this playbook are tested using Molecule using the Docker driver and the testinfra verifier. The containers are custom built to include systemd for supporting docker running inside docker independently from the host's docker installation. Even though nowadays you can run systemd inside Docker without a privileged containers, to get docker in docker working with systemd you still need a privileged container. Without this hacky setup, individual test runs could be impacted because of leftovers on the host system.
+All the included roles in this playbook are tested using Molecule using the Docker driver and the testinfra verifier. The containers are [custom built](roles/resources/Dockerfile.j2) to include systemd for running docker inside docker independently from the host's docker installation. Even though nowadays you can run systemd inside Docker without a privileged containers, to get docker in docker working with systemd you still need a privileged container. Without this hacky setup, individual test runs could be impacted because of leftovers on the host system.
 
-Since Home Assistant requires Docker to use the overlay2 driver, /var/lib/docker/overlay2 needs to be mounted to something outside the molecule test container so that docker (in docker) can write it's overlay2 data on a "normal" non-overlay2 filesystem, (overlay2 on overlay2 doesn't work). Because of the massive amounts of data which needs to be written to the overlay2 filesystem, mount it to a tmpfs is not possible because the default 1.5GB of RAM that's assigned to it is too small. Because of this, the molecule containers will mount /var/lib/docker/overlay2 somewhere in `/tmp`. This only works if `/tmp` isn't mounted as tmpfs in your host system.
+Since Home Assistant requires Docker to use the overlay2 driver, /var/lib/docker/overlay2 needs to be mounted to something outside the molecule test container so that docker (in docker) can write it's overlay2 data on a "normal" non-overlay2 filesystem, (overlay2 on overlay2 doesn't work). Because of the large amounts of data which needs to be written to the overlay2 filesystem, mounting that folder to a `tmpfs` mount is not possible because the default 1.5GB of RAM that's assigned to it is too small. Because of this, the molecule containers will mount `/var/lib/docker/overlay2` somewhere in `/tmp`. This only works if `/tmp` isn't mounted as tmpfs in your host system.
 
 Finally, to be able to run these tests you'll need a recent version of systemd on your host system. Systemd v148 (and higher?) is not supported though, it seems to break the systemd in docker support.
 
-The assertions in the tests are usually very basic but should cover the correct functioning of the role. 
+The assertions in the tests are usually very basic but should cover the correct functioning of the role.
 To prepare your environment for running tests:
 ```bash
-sudo apt-get install python3 python3-pip
-pip3 install pytest ansible molecule molecule[ansible,docker,lint] flake8 ansible-lint yamlllint pytest-testinfra
+sudo apt-get install python3 python3-pip gcc make libffi-dev
+pip3 install pytest ansible molecule molecule[ansible,docker,lint] molecule-docker flake8 ansible-lint yamllint pytest-testinfra
 docker run -d --restart=always --cap-drop=all --name apt-cacher-ng -p 3142:3142 konstruktoid/apt-cacher-ng VerboseLog=1 Debug=7 ForeGround=1 PassThroughPattern=.*
 ```
 The apt-cacher-ng docker container might speed up the molecule tests as it will cache all apt packages (the hit ratio on a good evening is 80%, which saved 1GB of data transfers).
 
-There's a bash script in the roles folder which will execute `molecule test` for all roles. I don't have the fastest setup ever (Manjaro, 3rd gen i3 running on a 10 years old HDD) but I can easily go have diner while all tests are running. To upside to the slowness is that I can optimize the playbook for running on even slower hardware. To run the molecule tests you need to specify three environment variables:
+There's a bash script in the roles folder which will execute `molecule test` for all roles. I don't have the fastest setup ever (Manjaro, 3rd gen i3 running on a 10 years old HDD) but I can easily go have diner while all tests are running. To upside to the slowness is that I can optimize the playbook for running on even slower hardware. To run the molecule tests by hand you need to specify three environment variables:
 * `MOLECULE_NAME`: an arbitrary name which will be used as the name for the container and the overlay2 folder in ` /tmp`
 * `MOLECULE_DISTRO`: the distribution to use, either debian or ubuntu
 * `MOLECULE_DISTRO_VERSION`: the version of the distro's docker image to use (e.g. `10.10` for Debian)
