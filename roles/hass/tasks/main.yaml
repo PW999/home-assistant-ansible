@@ -2,7 +2,7 @@
 # Docker will be installed using it's own role
 - name: Install latest hass requirements   # noqa package-latest
   apt:
-    name: [network-manager, apparmor, apparmor-utils, jq, curl, dbus]
+    name: [network-manager, apparmor, apparmor-utils, jq, curl, dbus, udisks2, libglib2.0-bin]
     install_recommends: false
     state: latest
 
