@@ -39,10 +39,19 @@
     mode: '0744'
   register: daemon_file
 
-- name: Install libffi for docker-compose    # noqa package-latest
+- name: Install depencenies for docker-compose    # noqa package-latest
   apt:
-    name: [libffi-dev]
+    name: [make, libffi-dev]
     state: latest
+
+- block:
+    - name: Make sure /tmp is executable or paramiko install will fail
+      ansible.posix.mount:
+        path: /tmp
+        state: remounted
+        opts: exec
+      changed_when: false
+  ignore_errors: true   # in case /tmp is not a mount point. Lazy fix
 
 - name: Install docker-compose   # noqa package-latest
   pip:
