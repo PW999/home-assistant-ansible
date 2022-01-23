@@ -3,7 +3,7 @@ case $1 in
 	"debian10")
 		export MOLECULE_NAME=debian10
 		export MOLECULE_DISTRO=debian
-		export MOLECULE_DISTRO_VERSION=10.10
+		export MOLECULE_DISTRO_VERSION=10.11
 		;;
 	"ubuntu20")
 		export MOLECULE_NAME=ubuntu20
