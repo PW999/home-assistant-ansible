@@ -1,7 +1,6 @@
 ---
 dependencies:
   - robertdebock.update_package_cache
-  - basic-tools
   - hass-srv-dir
   - python3
 

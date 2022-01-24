@@ -14,6 +14,7 @@
 - name: Install dependencies for convenience script    # noqa package-latest
   apt:
     name: [apt-transport-https, ca-certificates, curl]
+    install_recommends: false
     state: latest
 
 - name: Install docker using the convenience script
@@ -41,9 +42,13 @@
 
 - name: Install depencenies for docker-compose    # noqa package-latest
   apt:
-    name: [make, libffi-dev]
+    name: [make, libffi-dev, gcc, libc-dev]
+    install_recommends: false
     state: latest
 
+# Test would suddenly fail because /tmp was not mounted as executable anymore
+# Quick and dirty fix is to re-mount it as executable for the installation
+# Server should reboot anyway so this lazy quick fix kind of "works" for me now
 - block:
     - name: Make sure /tmp is executable or paramiko install will fail
       ansible.posix.mount:
