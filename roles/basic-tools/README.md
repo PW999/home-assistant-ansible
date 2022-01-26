@@ -10,6 +10,8 @@ A very basic role which installs some handy tools. Installs and updates followin
 * jq
 * lsof
 
+These tools are more a personal preference and are not needed for the actual installation of home assistant.
+
 ## Requirements
 
 None
@@ -32,4 +34,3 @@ None
         - role: robertdebock.update_package_cache
         - role: basic-tools
 ```
-

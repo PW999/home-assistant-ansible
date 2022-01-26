@@ -1,6 +1,6 @@
 # Ansible Role: aliasses
 
-Configures aliasses for a list of users
+Configures aliasses for a list of users. The list of aliasses can be found and configured in [files/bash_alias](files/bash_alias)
 
 ## Requirements
 
@@ -30,4 +30,3 @@ None
     roles:
         - role: aliasses
 ```
-
