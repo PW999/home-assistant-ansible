@@ -30,7 +30,7 @@ Once installed you can update Home Assistant through it's supervisor, this playb
 
 ## Compatibility
 
-The official Home Assistant documentation only mentions Debian 10 as supported host operating system, so the focus of this playbook lies on supporting that OS. Most roles are also tested against Ubuntu 20 and Ubuntu 21 in case you really want to run Home Assistant on another Debian based OS. Non-debian based OS'es are not (yet) supported by this playbook.
+The official Home Assistant documentation only mentions Debian 10 as supported host operating system, so the focus of this playbook lies on supporting that OS. Most roles are also tested against Ubuntu 20 and Ubuntu 21 in case you really want to run Home Assistant on another Debian based OS. Non-debian based OS'es are not supported by this playbook and will not be supported in the future.
 
 Keep in mind that the default outcome of this playbook does not meet the following of Home Assistant's criterias for having a "supported" setup: _"The operating system is dedicated to running Home Assistant Supervised."_ and _"No additional software, outside of the Home Assistant ecosystem, is installed."_. Skipping roles tagged with the 'extra' tag will bring you closest to a supported environment (see Advanced Installation) .
 
