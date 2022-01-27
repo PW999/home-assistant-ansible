@@ -1,11 +1,12 @@
 # Ansible Role: Grafana
 
-This role will setup a supervised Home Assistant using the convenience script provided by Home Assistant.
+This role will setup a supervised Home Assistant using packages provided by Home Assistant.
 To installation directory for hass is defined in the hass-srv-dir role.
 
 ## Requirements
 
 Python3
+Docker
 
 ## Role Variables
 
@@ -15,9 +16,9 @@ Python3
 
 It needs following roles:
 
+* robertdebock.update_package_cache
 * hass-srv-dir
 * docker
-* hass
 
 ## Usage Examples
 
@@ -30,4 +31,3 @@ It needs following roles:
         - role: docker
         - role: hass
 ```
-

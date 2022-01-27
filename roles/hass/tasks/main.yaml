@@ -2,7 +2,17 @@
 # Docker will be installed using it's own role
 - name: Install latest hass requirements   # noqa package-latest
   apt:
-    name: [network-manager, apparmor, apparmor-utils, jq, curl, dbus, udisks2, libglib2.0-bin]
+    name: [
+      network-manager,
+      apparmor,
+      apparmor-utils,
+      jq,
+      curl,
+      dbus,
+      udisks2,
+      libglib2.0-bin,
+      procps
+    ]
     install_recommends: false
     state: latest
 
@@ -17,29 +27,31 @@
     state: stopped
     name: ModemManager
     enabled: false
-  ignore_errors: true # in case modem manager does not exist
+  ignore_errors: true   # in case modem manager does not exist
   tags: notest
 
-# For idempotency checks of molecule
-- name: Check if script was already downloaded
+- name: Check if os agent was already downloaded
   stat:
-    path: "{{ install_dir }}/setup/hass-installer.sh"
-  register: hass_installer
+    path: "{{ install_dir }}/setup/os-agent.deb"
+  register: os_agent_installer
 
-- name: Download Home Assistant supervised install script
+- name: Download OS Agent package
   get_url:
-    url: https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh
-    dest: "{{ install_dir }}/setup/hass-installer.sh"
+    url: "{{ hass_os_agent_url }}"
+    dest: "{{ install_dir }}/setup/os-agent.deb"
     mode: 0740
     force: false
-  when: not hass_installer.stat.exists
+  when: not os_agent_installer.stat.exists
 
-# Otherwise the script keeps waiting
-- name: Modify script to not read from /dev/tty  # noqa no-handler
-  replace:
-    path: "{{ install_dir }}/setup/hass-installer.sh"
-    regexp: 'read answer < /dev/tty'
-    replace: 'answer=y'
+- name: Check if OS Agent is installed
+  command: dpkg-query -W os-agent
+  register: os_agent_package_check
+  failed_when: os_agent_package_check.rc > 1
+  changed_when: os_agent_package_check.rc == 1
+
+- name: Install OS Agent
+  apt: deb="{{ install_dir }}/setup/os-agent.deb"
+  when: os_agent_package_check.rc == 1
 
 - name: Print machine type
   debug:
@@ -53,10 +65,42 @@
     mode: '0750'
     state: directory
 
-- name: Supervised installer  # noqa no-handler
-  command:
-    cmd: |
-      {{ install_dir }}/setup/hass-installer.sh
-      --machine {{ machine_type }}
-      --data-share {{ install_dir }}/homeassistant
-    creates: "{{ install_dir }}/homeassistant/updater.json"
+- name: Create the apparmor directory
+  ansible.builtin.file:
+    path: "{{ install_dir }}/homeassistant/apparmor"
+    owner: root
+    group: root
+    mode: '0750'
+    state: directory
+
+- name: Check if supervisor package was already downloaded
+  stat:
+    path: "{{ install_dir }}/setup/homeassistant-supervised.deb"
+  register: supervisor_installer
+
+- name: Download Home Assistant supervised package
+  get_url:
+    url: "{{ hass_supervised_url }}"
+    dest: "{{ install_dir }}/setup/homeassistant-supervised.deb"
+    mode: 0740
+    force: false
+  when: not supervisor_installer.stat.exists
+
+- name: Check if Home Assistant is installed
+  command: dpkg-query -W homeassistant-supervised
+  register: home_assistant_package_check
+  failed_when: home_assistant_package_check.rc > 1
+  changed_when: home_assistant_package_check.rc == 1
+
+- name: Set Home Assistant machine type
+  ansible.builtin.debconf:
+    name: homeassistant-supervised
+    question: ha/machine-type
+    value: "{{ machine_type }}"
+    vtype: select
+
+- name: Install Home Assistant Supervised
+  apt: deb="{{ install_dir }}/setup/homeassistant-supervised.deb"
+  environment:
+    DATA_SHARE: "{{ install_dir }}/homeassistant"
+  when: home_assistant_package_check.rc == 1

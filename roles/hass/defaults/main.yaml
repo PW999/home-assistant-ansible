@@ -1,0 +1,5 @@
+---
+hass_supervised_url: >-
+  https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+hass_os_agent_url: >-
+  https://github.com/home-assistant/os-agent/releases/download/1.2.2/os-agent_1.2.2_linux_x86_64.deb

@@ -37,7 +37,7 @@
     dest: /etc/docker/daemon.json
     owner: root
     group: root
-    mode: '0744'
+    mode: '0644'
   register: daemon_file
 
 - name: Install depencenies for docker-compose    # noqa package-latest
