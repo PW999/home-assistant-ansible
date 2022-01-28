@@ -13,3 +13,14 @@
         state: started
         name: systemd-networkd-wait-online
         enabled: true
+
+    - name: Remove old docker data
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /var/lib/docker/runtimes/
+        - /var/lib/docker/containers/
+        - /var/lib/docker/network/
+        - /var/lib/docker/volumes/
+        - /var/lib/docker/tmp/

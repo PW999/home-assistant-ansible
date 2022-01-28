@@ -25,7 +25,7 @@ platforms:
       # - /var/lib/docker/overlay2
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - "/tmp/${MOLECULE_NAME}/overlay2:/var/lib/docker/overlay2"
+      - "/tmp/${MOLECULE_NAME}/docker:/var/lib/docker"
     env:
       DEBIAN_FRONTEND: noninteractive
       TZ: Europe/Brussels

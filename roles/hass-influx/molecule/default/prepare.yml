@@ -33,3 +33,14 @@
       loop:
         - /srv/homeassistant/homeassistant/secrets.yaml
         - /srv/homeassistant/homeassistant/configuration.yaml
+
+    - name: Remove old docker data
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /var/lib/docker/runtimes/
+        - /var/lib/docker/containers/
+        - /var/lib/docker/network/
+        - /var/lib/docker/volumes/
+        - /var/lib/docker/tmp/

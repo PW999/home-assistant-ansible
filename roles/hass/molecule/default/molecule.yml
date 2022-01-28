@@ -12,7 +12,6 @@ lint: |
     flake8
 platforms:
   - name: "${MOLECULE_NAME}-systemd-docker-with-compose"
-    # dockerfile: ../../../resources/Dockerfile.j2
     pull: false
     build_image: false
     image: "${MOLECULE_NAME}-systemd-docker-with-compose"

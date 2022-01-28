@@ -11,21 +11,10 @@ lint: |
     ansible-lint
     flake8
 platforms:
-  - name: "${MOLECULE_NAME}-systemd-docker"
+  - name: "${MOLECULE_NAME}"
     dockerfile: ../../../resources/Dockerfile.j2
     build_image: true
     image: "${MOLECULE_DISTRO}:${MOLECULE_DISTRO_VERSION}"
-    command: /sbin/init
-    privileged: true
-    # pre_build_image: true
-    tmpfs:
-      - /run
-      - /run/lock
-      - /tmp
-      # - /var/lib/docker/overlay2
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - "/tmp/${MOLECULE_NAME}/overlay2:/var/lib/docker/overlay2"
     env:
       DEBIAN_FRONTEND: noninteractive
       TZ: Europe/Brussels
@@ -33,6 +22,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    prepare: prepare.yml
+    prepare: ./prepare.yml
+    converge: ./converge.yml
 verifier:
   name: testinfra
+  directory: ./tests/

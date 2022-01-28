@@ -17,3 +17,14 @@
     - name: Clean up docker directory   # noqa deprecated-command-syntax no-changed-when
       command:
         cmd: rm -rf /var/lib/docker/overlay2/*
+
+    - name: Remove old docker data
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /var/lib/docker/runtimes/
+        - /var/lib/docker/containers/
+        - /var/lib/docker/network/
+        - /var/lib/docker/volumes/
+        - /var/lib/docker/tmp/
