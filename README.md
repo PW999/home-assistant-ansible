@@ -16,8 +16,6 @@
 
 This playbook installs the latest Home Assistant Supervised on Debian/Raspbian/Ubuntu.
 
-**IMPORTANT NOTICE: the playbook is currently broken because Home Assistant replaced the supervisor script with a deb package**
-
 More information about the Home Assistant supervised installer can be found in [the official supervised repo](https://github.com/home-assistant/supervised-installer)
 
 ## Project Description
