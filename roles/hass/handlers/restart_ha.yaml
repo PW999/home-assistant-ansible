@@ -4,7 +4,7 @@
 - block:
     - name: Restart command
       command:
-        cmd: docker exec hassio_cli ha core restart
+        cmd: ha core restart
       ignore_errors: true
       register: ha_restart_cmd
     - name: Print error
