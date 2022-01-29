@@ -5,6 +5,11 @@ case $1 in
 		export MOLECULE_DISTRO=debian
 		export MOLECULE_DISTRO_VERSION=10.11
 		;;
+	"debian11")
+		export MOLECULE_NAME=debian11
+		export MOLECULE_DISTRO=debian
+		export MOLECULE_DISTRO_VERSION=11.2
+		;;
 	"ubuntu20")
 		export MOLECULE_NAME=ubuntu20
 		export MOLECULE_DISTRO=ubuntu
@@ -25,5 +30,5 @@ export PY_COLORS=1
 
 # Configuration of the apt-cache caching proxy. See the main README on how to run the proxy
 # The IP address is that of the docker0 interface
-export APT_CACHE_IP=172.17.0.1
+export APT_CACHE_IP=172.18.0.1
 export APT_CACHE_PORT=3142
