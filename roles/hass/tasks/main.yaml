@@ -103,4 +103,41 @@
   apt: deb="{{ install_dir }}/setup/homeassistant-supervised.deb"
   environment:
     DATA_SHARE: "{{ install_dir }}/homeassistant"
+  register: homeassistant_install
   when: home_assistant_package_check.rc == 1
+
+- name: "[Workaround] Wait for containers to spin up"  # give the supervisor time to launch all containers
+  wait_for:
+    timeout: 15
+  when: >-
+    homeassistant_install.changed
+    and ansible_distribution == 'Debian'
+    and ansible_distribution_major_version == '11'
+
+- name: "[Workaround] Stop Home Assistant"
+  command: ha core stop
+  retries: 10
+  register: ha_restart_workaround
+  until: ha_restart_workaround.rc == 0
+  delay: 10
+  ignore_errors: true
+  when: >-
+    homeassistant_install.changed
+    and ansible_distribution == 'Debian'
+    and ansible_distribution_major_version == '11'
+
+- name: "[Workaround] Remove home assistant container"
+  community.docker.docker_container:
+    name: homeassistant
+    state: absent
+  when: >-
+    homeassistant_install.changed
+    and ansible_distribution == 'Debian'
+    and ansible_distribution_major_version == '11'
+
+- name: "[Workaround] Restart Home Assistant container"
+  command: ha core start
+  when: >-
+    homeassistant_install.changed
+    and ansible_distribution == 'Debian'
+    and ansible_distribution_major_version == '11'
