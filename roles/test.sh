@@ -41,8 +41,6 @@ do
 	if [ $? -ne 0 ]; then
 		echo "Molecule failed for $role"
 		cat "../$file_name.out"
-		cd ..
-		exit 1
 	fi
 	cd ..
 done
