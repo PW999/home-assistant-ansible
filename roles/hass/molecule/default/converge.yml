@@ -10,6 +10,3 @@
     - name: "Include hass role"
       include_role:
         name: "hass"
-    - name: "Wait before running the test"  # give the supervisor time to launch all containers
-      wait_for:
-        timeout: 20

@@ -106,38 +106,24 @@
   register: homeassistant_install
   when: home_assistant_package_check.rc == 1
 
-- name: "[Workaround] Wait for containers to spin up"  # give the supervisor time to launch all containers
+# For some reason, sometimes, the homeassistant container can't connect
+# to the supervisor. This seems to be more of a problem in Ubunt containers
+- name: "[Workaround] Just restart everything"  # noqa no-handler
+  ansible.builtin.systemd:
+    state: restarted
+    name: docker
+    enabled: true
+  when: not docker_in_docker and homeassistant_install.changed
+
+  # Wait for HA to come online, but if it does not, continue anyway
+- name: "[Workaround] Wait for Home Asssitant to be up"  # noqa no-handler
   wait_for:
-    timeout: 15
-  when: >-
-    homeassistant_install.changed
-    and ansible_distribution == 'Debian'
-    and ansible_distribution_major_version == '11'
-
-- name: "[Workaround] Stop Home Assistant"
-  command: ha core stop
-  retries: 10
-  register: ha_restart_workaround
-  until: ha_restart_workaround.rc == 0
-  delay: 10
+    port: 8123
+    state: started
+    connect_timeout: 10
+    delay: 30
+    sleep: 10
+    timeout: 300
   ignore_errors: true
-  when: >-
-    homeassistant_install.changed
-    and ansible_distribution == 'Debian'
-    and ansible_distribution_major_version == '11'
-
-- name: "[Workaround] Remove home assistant container"
-  community.docker.docker_container:
-    name: homeassistant
-    state: absent
-  when: >-
-    homeassistant_install.changed
-    and ansible_distribution == 'Debian'
-    and ansible_distribution_major_version == '11'
-
-- name: "[Workaround] Restart Home Assistant container"
-  command: ha core start
-  when: >-
-    homeassistant_install.changed
-    and ansible_distribution == 'Debian'
-    and ansible_distribution_major_version == '11'
+  register: home_assistant_container_check
+  when: homeassistant_install.changed
