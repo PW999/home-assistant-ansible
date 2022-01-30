@@ -18,10 +18,15 @@ case $1 in
 	"ubuntu21")
 		export MOLECULE_NAME=ubuntu21
 		export MOLECULE_DISTRO=ubuntu
-		export MOLECULE_DISTRO_VERSION=21.04
+		export MOLECULE_DISTRO_VERSION=21.10
+		;;
+	"ubuntu22")
+		export MOLECULE_NAME=ubuntu22
+		export MOLECULE_DISTRO=ubuntu
+		export MOLECULE_DISTRO_VERSION=22.04
 		;;
 	*)
-		echo "Invalid distribution name, supported names are debian10, ubuntu20, ubuntu21"
+		echo "Invalid distribution name $1, supported names are debian10, ubuntu20, ubuntu21"
 		exit 2
 		;;
 esac
