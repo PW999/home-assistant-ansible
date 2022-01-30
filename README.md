@@ -153,6 +153,8 @@ Since Home Assistant requires Docker to use the overlay2 driver, /var/lib/docker
 
 Finally, to be able to run these tests you'll need a recent version of systemd on your host system. Systemd v148 (and higher?) is not supported as it seems to break the systemd in docker support. Since it heavily relies on a _real_ Linux environment, the tests won't run under WSL or WSL2, you absolutely must run from a Debian based host or from a virtual machine running a Debian based OS.
 
+If you want to use Ubuntu 21 or newer, you also must have a recent version of Docker (>20) or you will run into this [bug](https://stackoverflow.com/a/66385784).
+
 ## Preparations
 
 The assertions in the tests are usually very basic but should cover the correct functioning of the role.
@@ -184,7 +186,7 @@ There a small extra step to take when running molecule for the first time for th
 Run the following commands:
 ```(bash)
 cd roles
-source ./setenv.sh debian10
+source ./setenv.sh [debian10|debian11|ubuntu20|ubuntu21|ubuntu22]  # <- pick your version
 cd docker
 molecule create
 molecule converge
