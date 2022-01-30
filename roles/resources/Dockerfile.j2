@@ -18,7 +18,7 @@ ENV {{ var }} {{ value }}
 # ENABLE APT CACHE #
 RUN echo "Acquire::http::Proxy \"$APT_PROXY_URL\";" > /etc/apt/apt.conf.d/00aptproxy
 
-RUN if [ $(command -v apt-get) ]; then                                                        apt-get update && apt-get install -y python sudo bash ca-certificates iproute2 init && apt-get clean; \
+RUN if [ $(command -v apt-get) ]; then                                                        apt-get update && apt-get install -y python3 sudo bash ca-certificates iproute2 init && apt-get clean; \
     elif [ $(command -v zypper) ]; then                                                       zypper refresh && zypper install -y python sudo bash python-xml iproute2 systemd-sysvinit && zypper clean -a; \
     elif [ $(command -v apk) ]; then                                                          apk update && apk add --no-cache python sudo bash ca-certificates; \
     elif [ $(command -v xbps-install) ]; then                                                 xbps-install -Syu && xbps-install -y python sudo bash ca-certificates iproute2 && xbps-remove -O; \

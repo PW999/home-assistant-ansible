@@ -13,7 +13,7 @@
 
 - name: Install dependencies for convenience script    # noqa package-latest
   apt:
-    name: [apt-transport-https, ca-certificates, curl]
+    name: [apt-transport-https, ca-certificates, curl, apt-utils]
     install_recommends: false
     state: latest
 
