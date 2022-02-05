@@ -55,6 +55,7 @@ pip3 install ansible
 
 git clone https://github.com/PW999/home-assistant-ansible.git
 cd home-assistant-ansible
+export set PATH=$PATH:~/.local/bin
 ansible-galaxy install -r requirements.yaml
 
 # Have a look at group_vars/all and update the variables to your needs
