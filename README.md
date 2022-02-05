@@ -62,7 +62,7 @@ ansible-galaxy install -r requirements.yaml
 # You must do this because there's some passwords to update
 # Using Ansible Vault for passwords would of course be the better solution
 # So consider this a quick-and-dirty install
-ansible-playbook playbook.yml -i hosts
+ansible-playbook playbook.yml -i hosts -b --become-user root --ask-become-pass
 ```
 
 The playbook _should_ automatically restart the system after everything is installed. If something goes wrong while runnig the playbook it's possible that the system won't restart so it's advised to reboot the system at least once after running it.
