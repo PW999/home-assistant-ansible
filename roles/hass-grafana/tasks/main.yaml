@@ -9,6 +9,8 @@
   loop:
     - "{{ install_dir }}/grafana"
     - "{{ install_dir }}/grafana/etc"
+    - "{{ install_dir }}/grafana/etc/provisioning"
+    - "{{ install_dir }}/grafana/etc/provisioning/datasources"
     - "{{ install_dir }}/grafana/log"
     - "{{ install_dir }}/grafana/lib"
 
