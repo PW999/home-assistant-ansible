@@ -79,14 +79,14 @@ git_user_name: demo
 
 # Give a lot of care to the filesystem, check every 2 reboots
 tune2fs_settings:
-- device: /dev/sda3
+- device: /dev/sda1
   maximum_count_mount: 2
 
 # Cleanup the logs every 14d (only if you run the playbook every 14d)
 maintenance_journalctl_vacuum: 14d
 
 # Configure the influx container
-influxdb_version: 1.8.5
+influxdb_version: 1.8.10
 influxdb_user: hass_rw
 influxdb_user_password: hass_rw_pwd
 influxdb_read_user: hass_ro
@@ -97,7 +97,7 @@ influxdb_admin_user: admin
 influxdb_admin_password: admin_pwd
 
 # Configure the grafana container (it'll use the credentials from influx_db_ro*)
-grafana_version: 7.5.6
+grafana_version: 8.2.6
 
 # Setup Samba
 samba_workgroup: MYCASA
@@ -105,5 +105,6 @@ samba_version: 4.12.9
 samba_password: YOUR_PASSWORD
 
 # Setup an rsync to a remote server (e.g. a Synology to which you added your pub-key)
-hass_backup_rsync_destination: 'homeassistant@YOUR_IP::NetBackup/home-assistant/'
-hass_backup_ssh_key: files/key.priv
+# Comment by default because it will fail because the file is missing
+# hass_backup_rsync_destination: 'homeassistant@YOUR_IP::NetBackup/home-assistant/'
+# hass_backup_ssh_key: files/key.priv
