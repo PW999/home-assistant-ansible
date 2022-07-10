@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/PW999/home-assistant-ansible)
 ![BETA](https://img.shields.io/badge/status-beta-yellowgreen)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/pw999/home-assistant-ansible)
-![Maintenance](https://img.shields.io/maintenance/yes/2022)
+![Maintenance](https://img.shields.io/maintenance/no/2022)
 
 
 ![Tested](https://img.shields.io/badge/Debian-10-green)
